@@ -1,0 +1,413 @@
+[
+    {
+        "step": "create_dataiku_project",
+        "parameters": {
+            "project_key": "SALES_ANALYSIS",
+            "name": "Sales Data Integration",
+            "description": "Migrating Alteryx workflows to Dataiku DSS for sales data analysis."
+        }
+    },
+    {
+        "step": "create_connection",
+        "parameters": {
+            "connection_name": "QuotaConnection",
+            "connection_type": "Excel",
+            "folder_path": "ApplicationsData/SalesData/Quota/",
+            "dataset_name": "Quota.xlsx"
+        }
+    },
+    {
+        "step": "create_connection",
+        "parameters": {
+            "connection_name": "OrdersEastConnection",
+            "connection_type": "Excel",
+            "folder_path": "ApplicationsData/SalesData/OrdersEast/",
+            "dataset_name": "Orders_East.xlsx"
+        }
+    },
+    {
+        "step": "create_connection",
+        "parameters": {
+            "connection_name": "OrdersCentralConnection",
+            "connection_type": "CSV",
+            "folder_path": "ApplicationsData/SalesData/OrdersCentral/",
+            "dataset_name": "Orders_Central.csv"
+        }
+    },
+    {
+        "step": "create_connection",
+        "parameters": {
+            "connection_name": "OrdersSouthConnection",
+            "connection_type": "CSV",
+            "folder_path": "ApplicationsData/SalesData/OrdersSouth/",
+            "dataset_name": "orders_south_2015.csv"
+        }
+    },
+    {
+        "step": "create_connection",
+        "parameters": {
+            "connection_name": "ReturnReasonsConnection",
+            "connection_type": "Excel",
+            "folder_path": "ApplicationsData/SalesData/ReturnReasons/",
+            "dataset_name": "return reasons_new.xlsx"
+        }
+    },
+    {
+        "step": "create_connection",
+        "parameters": {
+            "connection_name": "OrdersWestConnection",
+            "connection_type": "CSV",
+            "folder_path": "ApplicationsData/SalesData/OrdersWest/",
+            "dataset_name": "Orders_West.csv"
+        }
+    },
+    {
+        "step": "create_recipe",
+        "parameters": {
+            "recipe_type": "prepare",
+            "input_dataset": "Orders_Central.csv",
+            "output_dataset": "Orders_Central_Prepared",
+            "transformations": [
+                {
+                    "transformation": "add_column",
+                    "parameters": {
+                        "column_name": "Region",
+                        "value": "Central"
+                    }
+                },
+                {
+                    "transformation": "concatenate_columns",
+                    "parameters": {
+                        "new_column_name": "Order Date",
+                        "columns_to_concatenate": [
+                            "Order Day",
+                            "Order Month",
+                            "Order Year"
+                        ]
+                    }
+                },
+                {
+                    "transformation": "convert_data_type",
+                    "parameters": {
+                        "column_name": "Order Date",
+                        "new_data_type": "date"
+                    }
+                },
+                {
+                    "transformation": "concatenate_columns",
+                    "parameters": {
+                        "new_column_name": "Ship Date",
+                        "columns_to_concatenate": [
+                            "Ship Day",
+                            "Ship Month",
+                            "Ship Year"
+                        ]
+                    }
+                },
+                {
+                    "transformation": "rename_column",
+                    "parameters": {
+                        "old_column_name": "Discounts",
+                        "new_column_name": "Discount"
+                    }
+                },
+                {
+                    "transformation": "rename_column",
+                    "parameters": {
+                        "old_column_name": "Product",
+                        "new_column_name": "Product Name"
+                    }
+                },
+                {
+                    "transformation": "convert_data_type",
+                    "parameters": {
+                        "column_name": "Ship Date",
+                        "new_data_type": "date"
+                    }
+                },
+                {
+                    "transformation": "remove_columns",
+                    "parameters": {
+                        "columns_to_remove": [
+                            "Order Year",
+                            "Order Month",
+                            "Order Day",
+                            "Ship Year",
+                            "Ship Month",
+                            "Ship Day"
+                        ]
+                    }
+                }
+            ]
+        }
+    },
+    {
+        "step": "create_recipe",
+        "parameters": {
+            "recipe_type": "filter",
+            "input_dataset": "Orders_Central_Prepared",
+            "output_dataset": "Orders_Central_Filtered",
+            "filter_conditions": [
+                {
+                    "column_name": "Order ID",
+                    "condition": "is_not_null"
+                }
+            ]
+        }
+    },
+    {
+        "step": "create_recipe",
+        "parameters": {
+            "recipe_type": "prepare",
+            "input_dataset": "Orders_Central_Filtered",
+            "output_dataset": "Orders_Central_Typed",
+            "transformations": [
+                {
+                    "transformation": "convert_data_type",
+                    "parameters": {
+                        "column_name": "Discount",
+                        "new_data_type": "string"
+                    }
+                },
+                {
+                    "transformation": "remove_letters",
+                    "parameters": {
+                        "column_name": "Sales"
+                    }
+                },
+                {
+                    "transformation": "convert_data_type",
+                    "parameters": {
+                        "column_name": "Sales",
+                        "new_data_type": "real"
+                    }
+                }
+            ]
+        }
+    },
+    {
+        "step": "create_recipe",
+        "parameters": {
+            "recipe_type": "prepare",
+            "input_dataset": "Orders_Central_Typed",
+            "output_dataset": "Orders_Central_States",
+            "transformations": [
+                {
+                    "transformation": "remap_values",
+                    "parameters": {
+                        "column_name": "State",
+                        "mapping": {
+                            "California": "CA",
+                            "New York": "NY"
+                        }
+                    }
+                }
+            ]
+        }
+    },
+    {
+        "step": "create_recipe",
+        "parameters": {
+            "recipe_type": "pivot",
+            "input_dataset": "Quota.xlsx",
+            "output_dataset": "Quota_Unpivoted",
+            "pivot_parameters": {
+                "columns_to_unpivot": [
+                    "2015",
+                    "2016",
+                    "2017",
+                    "2018"
+                ],
+                "new_column_names": [
+                    "Year",
+                    "Quota"
+                ]
+            }
+        }
+    },
+    {
+        "step": "create_recipe",
+        "parameters": {
+            "recipe_type": "prepare",
+            "input_dataset": "Quota_Unpivoted",
+            "output_dataset": "Quota_Typed",
+            "transformations": [
+                {
+                    "transformation": "convert_data_type",
+                    "parameters": {
+                        "column_name": "Year",
+                        "new_data_type": "integer"
+                    }
+                }
+            ]
+        }
+    },
+    {
+        "step": "create_recipe",
+        "parameters": {
+            "recipe_type": "union",
+            "input_datasets": [
+                "Orders_Central_States",
+                "Orders_West.csv",
+                "Orders_East.xlsx",
+                "orders_south_2015.csv"
+            ],
+            "output_dataset": "All_Orders",
+            "union_parameters": {
+                "columns_to_union": "all"
+            }
+        }
+    },
+    {
+        "step": "create_recipe",
+        "parameters": {
+            "recipe_type": "join",
+            "input_datasets": [
+                "All_Orders",
+                "return reasons_new.xlsx"
+            ],
+            "output_dataset": "Orders_Returns_Joined",
+            "join_parameters": {
+                "join_type": "right",
+                "keys": [
+                    "Product ID",
+                    "Order ID"
+                ]
+            }
+        }
+    },
+    {
+        "step": "create_recipe",
+        "parameters": {
+            "recipe_type": "prepare",
+            "input_dataset": "Orders_Returns_Joined",
+            "output_dataset": "Orders_Returns_Prepared",
+            "transformations": [
+                {
+                    "transformation": "add_column",
+                    "parameters": {
+                        "column_name": "Returned?",
+                        "value": "if_else(is_not_null(Return Reason), 'Yes', 'No')"
+                    }
+                },
+                {
+                    "transformation": "calculate_difference",
+                    "parameters": {
+                        "new_column_name": "Days to Ship",
+                        "columns": [
+                            "Order Date",
+                            "Ship Date"
+                        ]
+                    }
+                },
+                {
+                    "transformation": "replace_nulls",
+                    "parameters": {
+                        "column_name": "Discount",
+                        "replacement_value": 0
+                    }
+                },
+                {
+                    "transformation": "extract_year",
+                    "parameters": {
+                        "new_column_name": "Year of Sale",
+                        "column": "Order Date"
+                    }
+                },
+                {
+                    "transformation": "exclude_rows",
+                    "parameters": {
+                        "column_name": "Discount",
+                        "condition": "between(17, 18)"
+                    }
+                }
+            ]
+        }
+    },
+    {
+        "step": "create_recipe",
+        "parameters": {
+            "recipe_type": "prepare",
+            "input_dataset": "Orders_Returns_Prepared",
+            "output_dataset": "Orders_Returns_Cleaned",
+            "transformations": [
+                {
+                    "transformation": "split_column",
+                    "parameters": {
+                        "column_name": "Notes",
+                        "new_column_names": [
+                            "Return Notes",
+                            "Approver"
+                        ]
+                    }
+                },
+                {
+                    "transformation": "rename_column",
+                    "parameters": {
+                        "old_column_name": "Notes - Split 1",
+                        "new_column_name": "Return Notes"
+                    }
+                },
+                {
+                    "transformation": "rename_column",
+                    "parameters": {
+                        "old_column_name": "Notes - Split 2",
+                        "new_column_name": "Approver"
+                    }
+                },
+                {
+                    "transformation": "remove_column",
+                    "parameters": {
+                        "column_name": "Notes"
+                    }
+                },
+                {
+                    "transformation": "standardize_values",
+                    "parameters": {
+                        "column_name": "Approver"
+                    }
+                }
+            ]
+        }
+    },
+    {
+        "step": "create_recipe",
+        "parameters": {
+            "recipe_type": "aggregate",
+            "input_dataset": "Orders_Returns_Cleaned",
+            "output_dataset": "Sales_Rollup",
+            "aggregation_parameters": {
+                "columns_to_aggregate": [
+                    "Profit",
+                    "Sales",
+                    "Quantity",
+                    "Discount"
+                ],
+                "aggregation_functions": {
+                    "Profit": "sum",
+                    "Sales": "sum",
+                    "Quantity": "sum",
+                    "Discount": "average"
+                }
+            }
+        }
+    },
+    {
+        "step": "create_recipe",
+        "parameters": {
+            "recipe_type": "join",
+            "input_datasets": [
+                "Sales_Rollup",
+                "Quota_Typed"
+            ],
+            "output_dataset": "Quota_Orders_Joined",
+            "join_parameters": {
+                "join_type": "inner",
+                "keys": [
+                    "Region",
+                    "Year"
+                ]
+            }
+        }
+    }
+]
