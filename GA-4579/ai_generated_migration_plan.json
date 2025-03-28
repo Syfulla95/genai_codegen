@@ -1,0 +1,345 @@
+[
+    {
+        "step": "create_dataiku_project",
+        "parameters": {
+            "project_key": "CUSTOMER_360_ANALYSIS",
+            "name": "Customer 360 Data Integration",
+            "description": "Migrating Alteryx workflows for comprehensive customer analysis."
+        }
+    },
+    {
+        "step": "create_connection",
+        "parameters": {
+            "connection_name": "AIMLInsightsConnection",
+            "connection_type": "File",
+            "folder_path": "tfs://dataeconomy-9k42/62457/uploads/62457/29aabe9d-c354-4176-8f98-2dd7a5fd7216/",
+            "dataset_name": "aiml_insights.csv"
+        }
+    },
+    {
+        "step": "create_connection",
+        "parameters": {
+            "connection_name": "ClaimsDataConnection",
+            "connection_type": "File",
+            "folder_path": "tfs://dataeconomy-9k42/62457/uploads/62457/29aabe9d-c354-4176-8f98-2dd7a5fd7216/",
+            "dataset_name": "claims.csv"
+        }
+    },
+    {
+        "step": "create_connection",
+        "parameters": {
+            "connection_name": "PolicyDataConnection",
+            "connection_type": "File",
+            "folder_path": "tfs://dataeconomy-9k42/62457/uploads/62457/29aabe9d-c354-4176-8f98-2dd7a5fd7216/",
+            "dataset_name": "policy.csv"
+        }
+    },
+    {
+        "step": "create_connection",
+        "parameters": {
+            "connection_name": "DemographicsDataConnection",
+            "connection_type": "File",
+            "folder_path": "tfs://dataeconomy-9k42/62457/uploads/62457/29aabe9d-c354-4176-8f98-2dd7a5fd7216/",
+            "dataset_name": "demographics.csv"
+        }
+    },
+    {
+        "step": "create_connection",
+        "parameters": {
+            "connection_name": "ScoresDataConnection",
+            "connection_type": "File",
+            "folder_path": "tfs://dataeconomy-9k42/62457/uploads/62457/29aabe9d-c354-4176-8f98-2dd7a5fd7216/",
+            "dataset_name": "scores.csv"
+        }
+    },
+    {
+        "step": "import_dataset",
+        "parameters": {
+            "project_key": "CUSTOMER_360_ANALYSIS",
+            "connection_name": "AIMLInsightsConnection",
+            "dataset_name": "aiml_insights"
+        }
+    },
+    {
+        "step": "import_dataset",
+        "parameters": {
+            "project_key": "CUSTOMER_360_ANALYSIS",
+            "connection_name": "ClaimsDataConnection",
+            "dataset_name": "claims"
+        }
+    },
+    {
+        "step": "import_dataset",
+        "parameters": {
+            "project_key": "CUSTOMER_360_ANALYSIS",
+            "connection_name": "PolicyDataConnection",
+            "dataset_name": "policy"
+        }
+    },
+    {
+        "step": "import_dataset",
+        "parameters": {
+            "project_key": "CUSTOMER_360_ANALYSIS",
+            "connection_name": "DemographicsDataConnection",
+            "dataset_name": "demographics"
+        }
+    },
+    {
+        "step": "import_dataset",
+        "parameters": {
+            "project_key": "CUSTOMER_360_ANALYSIS",
+            "connection_name": "ScoresDataConnection",
+            "dataset_name": "scores"
+        }
+    },
+    {
+        "step": "create_prepare_recipe",
+        "parameters": {
+            "project_key": "CUSTOMER_360_ANALYSIS",
+            "input_dataset": "demographics",
+            "output_dataset": "demographics_prepared",
+            "actions": [
+                {
+                    "action": "select_columns",
+                    "parameters": {
+                        "columns": [
+                            "Customer_ID",
+                            "Customer_Name",
+                            "Email",
+                            "Phone_Number",
+                            "Address",
+                            "City",
+                            "State",
+                            "Postal_Code",
+                            "Date_of_Birth",
+                            "Gender",
+                            "Marital_Status",
+                            "Occupation",
+                            "Income_Level",
+                            "Customer_Segment"
+                        ]
+                    }
+                }
+            ]
+        }
+    },
+    {
+        "step": "create_prepare_recipe",
+        "parameters": {
+            "project_key": "CUSTOMER_360_ANALYSIS",
+            "input_dataset": "claims",
+            "output_dataset": "claims_prepared",
+            "actions": [
+                {
+                    "action": "select_columns",
+                    "parameters": {
+                        "columns": [
+                            "Claim_ID",
+                            "Policy_ID",
+                            "Claim_Date",
+                            "Claim_Type",
+                            "Claim_Status",
+                            "Claim_Amount",
+                            "Claim_Payout"
+                        ]
+                    }
+                }
+            ]
+        }
+    },
+    {
+        "step": "create_prepare_recipe",
+        "parameters": {
+            "project_key": "CUSTOMER_360_ANALYSIS",
+            "input_dataset": "policy",
+            "output_dataset": "policy_prepared",
+            "actions": [
+                {
+                    "action": "select_columns",
+                    "parameters": {
+                        "columns": [
+                            "policy_id",
+                            "customer_id",
+                            "policy_type",
+                            "policy_status",
+                            "policy_start_date",
+                            "policy_end_date",
+                            "policy_term",
+                            "policy_premium",
+                            "total_premium_paid",
+                            "renewal_status",
+                            "policy_addons"
+                        ]
+                    }
+                }
+            ]
+        }
+    },
+    {
+        "step": "create_join_recipe",
+        "parameters": {
+            "project_key": "CUSTOMER_360_ANALYSIS",
+            "input_datasets": [
+                "demographics_prepared",
+                "policy_prepared"
+            ],
+            "output_dataset": "demographics_policy_joined",
+            "join_type": "inner",
+            "join_conditions": [
+                {
+                    "left_column": "Customer_ID",
+                    "right_column": "customer_id"
+                }
+            ]
+        }
+    },
+    {
+        "step": "create_join_recipe",
+        "parameters": {
+            "project_key": "CUSTOMER_360_ANALYSIS",
+            "input_datasets": [
+                "demographics_policy_joined",
+                "claims_prepared"
+            ],
+            "output_dataset": "demographics_policy_claims_joined",
+            "join_type": "inner",
+            "join_conditions": [
+                {
+                    "left_column": "policy_id",
+                    "right_column": "Policy_ID"
+                }
+            ]
+        }
+    },
+    {
+        "step": "create_group_recipe",
+        "parameters": {
+            "project_key": "CUSTOMER_360_ANALYSIS",
+            "input_dataset": "demographics_policy_claims_joined",
+            "output_dataset": "claims_summary",
+            "group_by": [
+                "Customer_ID"
+            ],
+            "aggregations": [
+                {
+                    "column": "Claim_ID",
+                    "aggregation": "count",
+                    "alias": "Total_Claims"
+                },
+                {
+                    "column": "policy_id",
+                    "aggregation": "count",
+                    "alias": "Policy_Count"
+                },
+                {
+                    "column": "Claim_Date",
+                    "aggregation": "max",
+                    "alias": "Recent_Claim_Date"
+                },
+                {
+                    "column": "Claim_Amount",
+                    "aggregation": "avg",
+                    "alias": "Average_Claim_Amount"
+                }
+            ]
+        }
+    },
+    {
+        "step": "create_join_recipe",
+        "parameters": {
+            "project_key": "CUSTOMER_360_ANALYSIS",
+            "input_datasets": [
+                "claims_summary",
+                "demographics_policy_claims_joined"
+            ],
+            "output_dataset": "final_joined_data",
+            "join_type": "inner",
+            "join_conditions": [
+                {
+                    "left_column": "Customer_ID",
+                    "right_column": "Customer_ID"
+                }
+            ]
+        }
+    },
+    {
+        "step": "create_prepare_recipe",
+        "parameters": {
+            "project_key": "CUSTOMER_360_ANALYSIS",
+            "input_dataset": "final_joined_data",
+            "output_dataset": "final_calculated_data",
+            "actions": [
+                {
+                    "action": "add_column",
+                    "parameters": {
+                        "name": "Age",
+                        "formula": "DateTimeDiff(DateTimeToday(), Date_of_Birth, 'years')"
+                    }
+                },
+                {
+                    "action": "add_column",
+                    "parameters": {
+                        "name": "Claim_To_Premium_Ratio",
+                        "formula": "if(total_premium_paid != 0, Claim_Amount / total_premium_paid, 0)"
+                    }
+                },
+                {
+                    "action": "add_column",
+                    "parameters": {
+                        "name": "Claims_Per_Policy",
+                        "formula": "if(Policy_Count != 0, Total_Claims / Policy_Count, 0)"
+                    }
+                },
+                {
+                    "action": "add_column",
+                    "parameters": {
+                        "name": "Retention_Rate",
+                        "formula": "0.85"
+                    }
+                },
+                {
+                    "action": "add_column",
+                    "parameters": {
+                        "name": "Cross_Sell_Opportunities",
+                        "formula": "'Multi-Policy Discount, Home Coverage Add-on'"
+                    }
+                },
+                {
+                    "action": "add_column",
+                    "parameters": {
+                        "name": "Upsell_Potential",
+                        "formula": "'Premium Vehicle Coverage'"
+                    }
+                }
+            ]
+        }
+    },
+    {
+        "step": "create_join_recipe",
+        "parameters": {
+            "project_key": "CUSTOMER_360_ANALYSIS",
+            "input_datasets": [
+                "final_calculated_data",
+                "aiml_insights",
+                "scores"
+            ],
+            "output_dataset": "customer_360_final",
+            "join_type": "inner",
+            "join_conditions": [
+                {
+                    "left_column": "Customer_ID",
+                    "right_column": "Customer_ID"
+                }
+            ]
+        }
+    },
+    {
+        "step": "export_dataset",
+        "parameters": {
+            "project_key": "CUSTOMER_360_ANALYSIS",
+            "input_dataset": "customer_360_final",
+            "output_path": "tfs://dataeconomy-9k42/62457/uploads/62457/Customer_360.csv",
+            "format": "csv"
+        }
+    }
+]
