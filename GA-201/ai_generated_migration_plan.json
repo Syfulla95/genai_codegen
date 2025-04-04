@@ -1,0 +1,386 @@
+[
+    {
+        "step": "create_dataiku_project",
+        "parameters": {
+            "project_key": "SALES_DATA_INTEGRATION",
+            "name": "Sales Data Integration",
+            "description": "Migrating Alteryx workflows for consolidating sales data from various regional sources, applying necessary transformations, and generating output files for analysis."
+        }
+    },
+    {
+        "step": "create_connection",
+        "parameters": {
+            "connection_name": "QuotaDataConnection",
+            "connection_type": "Excel",
+            "file_path": "Quota.xlsx",
+            "dataset_name": "Quota Data"
+        }
+    },
+    {
+        "step": "create_connection",
+        "parameters": {
+            "connection_name": "OrdersEastConnection",
+            "connection_type": "Excel",
+            "file_path": "Orders_East.xlsx",
+            "dataset_name": "Orders East Data"
+        }
+    },
+    {
+        "step": "create_connection",
+        "parameters": {
+            "connection_name": "OrdersCentralConnection",
+            "connection_type": "CSV",
+            "file_path": "Orders_Central.csv",
+            "dataset_name": "Orders Central Data"
+        }
+    },
+    {
+        "step": "create_connection",
+        "parameters": {
+            "connection_name": "OrdersSouthConnection",
+            "connection_type": "CSV",
+            "file_path": "orders_south_2015.csv",
+            "dataset_name": "Orders South Data"
+        }
+    },
+    {
+        "step": "create_connection",
+        "parameters": {
+            "connection_name": "ReturnReasonsConnection",
+            "connection_type": "Excel",
+            "file_path": "return reasons_new.xlsx",
+            "dataset_name": "Return Reasons Data"
+        }
+    },
+    {
+        "step": "create_connection",
+        "parameters": {
+            "connection_name": "OrdersWestConnection",
+            "connection_type": "CSV",
+            "file_path": "Orders_West.csv",
+            "dataset_name": "Orders West Data"
+        }
+    },
+    {
+        "step": "create_dataset",
+        "parameters": {
+            "project_key": "SALES_DATA_INTEGRATION",
+            "dataset_name": "Consolidated Orders",
+            "source_datasets": [
+                "Orders East Data",
+                "Orders Central Data",
+                "Orders South Data",
+                "Orders West Data"
+            ],
+            "recipe_type": "Union"
+        }
+    },
+    {
+        "step": "create_recipe",
+        "parameters": {
+            "project_key": "SALES_DATA_INTEGRATION",
+            "recipe_name": "Fix Dates",
+            "recipe_type": "Prepare",
+            "operations": [
+                {
+                    "operation": "Add Column",
+                    "parameters": {
+                        "column_name": "Order Date",
+                        "formula": "CONCAT(Order Day, '-', Order Month, '-', Order Year)"
+                    }
+                },
+                {
+                    "operation": "Change Type",
+                    "parameters": {
+                        "column_name": "Order Date",
+                        "new_type": "date"
+                    }
+                },
+                {
+                    "operation": "Add Column",
+                    "parameters": {
+                        "column_name": "Ship Date",
+                        "formula": "CONCAT(Ship Day, '-', Ship Month, '-', Ship Year)"
+                    }
+                },
+                {
+                    "operation": "Change Type",
+                    "parameters": {
+                        "column_name": "Ship Date",
+                        "new_type": "date"
+                    }
+                }
+            ]
+        }
+    },
+    {
+        "step": "create_recipe",
+        "parameters": {
+            "project_key": "SALES_DATA_INTEGRATION",
+            "recipe_name": "Remove Nulls",
+            "recipe_type": "Filter",
+            "conditions": [
+                {
+                    "column": "Order ID",
+                    "condition": "is not null"
+                }
+            ]
+        }
+    },
+    {
+        "step": "create_recipe",
+        "parameters": {
+            "project_key": "SALES_DATA_INTEGRATION",
+            "recipe_name": "Fix Data Types",
+            "recipe_type": "Prepare",
+            "operations": [
+                {
+                    "operation": "Change Type",
+                    "parameters": {
+                        "column_name": "Discount",
+                        "new_type": "string"
+                    }
+                },
+                {
+                    "operation": "Remove Letters",
+                    "parameters": {
+                        "column_name": "Sales"
+                    }
+                },
+                {
+                    "operation": "Change Type",
+                    "parameters": {
+                        "column_name": "Sales",
+                        "new_type": "real"
+                    }
+                }
+            ]
+        }
+    },
+    {
+        "step": "create_recipe",
+        "parameters": {
+            "project_key": "SALES_DATA_INTEGRATION",
+            "recipe_name": "Rename States",
+            "recipe_type": "Prepare",
+            "operations": [
+                {
+                    "operation": "Remap Values",
+                    "parameters": {
+                        "column_name": "State",
+                        "mapping": {
+                            "California": "CA",
+                            "New York": "NY"
+                        }
+                    }
+                }
+            ]
+        }
+    },
+    {
+        "step": "create_recipe",
+        "parameters": {
+            "project_key": "SALES_DATA_INTEGRATION",
+            "recipe_name": "Pivot Quotas",
+            "recipe_type": "Pivot",
+            "operations": [
+                {
+                    "operation": "Unpivot",
+                    "parameters": {
+                        "columns": [
+                            "2015",
+                            "2016",
+                            "2017",
+                            "2018"
+                        ],
+                        "new_column_name": "Year",
+                        "new_value_name": "Quota"
+                    }
+                },
+                {
+                    "operation": "Change Type",
+                    "parameters": {
+                        "column_name": "Year",
+                        "new_type": "integer"
+                    }
+                }
+            ]
+        }
+    },
+    {
+        "step": "create_recipe",
+        "parameters": {
+            "project_key": "SALES_DATA_INTEGRATION",
+            "recipe_name": "Orders + Returns",
+            "recipe_type": "Join",
+            "join_type": "Right",
+            "left_dataset": "Consolidated Orders",
+            "right_dataset": "Return Reasons Data",
+            "on": [
+                {
+                    "left_column": "Product ID",
+                    "right_column": "Product ID"
+                },
+                {
+                    "left_column": "Order ID",
+                    "right_column": "Order ID"
+                }
+            ],
+            "operations": [
+                {
+                    "operation": "Add Column",
+                    "parameters": {
+                        "column_name": "Returned?",
+                        "formula": "IF(Return Reason IS NOT NULL, 'Yes', 'No')"
+                    }
+                },
+                {
+                    "operation": "Add Column",
+                    "parameters": {
+                        "column_name": "Days to Ship",
+                        "formula": "DATEDIFF(Ship Date, Order Date)"
+                    }
+                },
+                {
+                    "operation": "Fill Missing",
+                    "parameters": {
+                        "column_name": "Discount",
+                        "value": 0
+                    }
+                },
+                {
+                    "operation": "Add Column",
+                    "parameters": {
+                        "column_name": "Year of Sale",
+                        "formula": "YEAR(Order Date)"
+                    }
+                }
+            ]
+        }
+    },
+    {
+        "step": "create_recipe",
+        "parameters": {
+            "project_key": "SALES_DATA_INTEGRATION",
+            "recipe_name": "Clean Notes/Approver",
+            "recipe_type": "Prepare",
+            "operations": [
+                {
+                    "operation": "Split Column",
+                    "parameters": {
+                        "column_name": "Notes",
+                        "new_columns": [
+                            "Return Notes",
+                            "Approver"
+                        ],
+                        "delimiter": ";"
+                    }
+                },
+                {
+                    "operation": "Remove Column",
+                    "parameters": {
+                        "column_name": "Notes"
+                    }
+                },
+                {
+                    "operation": "Standardize",
+                    "parameters": {
+                        "column_name": "Approver"
+                    }
+                }
+            ]
+        }
+    },
+    {
+        "step": "create_recipe",
+        "parameters": {
+            "project_key": "SALES_DATA_INTEGRATION",
+            "recipe_name": "Roll Up Sales",
+            "recipe_type": "Group",
+            "group_by": [
+                "Region",
+                "Year of Sale"
+            ],
+            "aggregations": [
+                {
+                    "column": "Profit",
+                    "aggregation": "sum"
+                },
+                {
+                    "column": "Sales",
+                    "aggregation": "sum"
+                },
+                {
+                    "column": "Quantity",
+                    "aggregation": "sum"
+                },
+                {
+                    "column": "Discount",
+                    "aggregation": "avg"
+                }
+            ]
+        }
+    },
+    {
+        "step": "create_recipe",
+        "parameters": {
+            "project_key": "SALES_DATA_INTEGRATION",
+            "recipe_name": "Quota + Orders",
+            "recipe_type": "Join",
+            "join_type": "Inner",
+            "left_dataset": "Quota Data",
+            "right_dataset": "Roll Up Sales",
+            "on": [
+                {
+                    "left_column": "Region",
+                    "right_column": "Region"
+                },
+                {
+                    "left_column": "Year",
+                    "right_column": "Year of Sale"
+                }
+            ]
+        }
+    },
+    {
+        "step": "create_output",
+        "parameters": {
+            "project_key": "SALES_DATA_INTEGRATION",
+            "output_name": "Annual Regional Performance",
+            "output_type": "Hyper",
+            "dataset": "Quota + Orders",
+            "fields": [
+                "Region",
+                "Year of Sale",
+                "Profit",
+                "Sales",
+                "Quantity",
+                "Discount"
+            ]
+        }
+    },
+    {
+        "step": "create_output",
+        "parameters": {
+            "project_key": "SALES_DATA_INTEGRATION",
+            "output_name": "Superstore Sales",
+            "output_type": "Hyper",
+            "dataset": "Orders + Returns",
+            "fields": [
+                "Order ID",
+                "Product ID",
+                "Return Reason",
+                "Return Notes",
+                "Approver",
+                "Returned?",
+                "Days to Ship",
+                "Year of Sale",
+                "Region",
+                "Profit",
+                "Sales",
+                "Quantity",
+                "Discount"
+            ]
+        }
+    }
+]
