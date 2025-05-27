@@ -30,7 +30,7 @@
             "parameters": {
                 "project_key": "CUSTOMER360_PROJECT",
                 "recipe_name": "prepare_demographics",
-                "input_dataset": "demographics.xlsx",
+                "input_dataset": "demographics",
                 "output_dataset": "prepared_demographics",
                 "actions": [
                     {
@@ -62,7 +62,7 @@
             "parameters": {
                 "project_key": "CUSTOMER360_PROJECT",
                 "recipe_name": "prepare_policy",
-                "input_dataset": "policy.xlsx",
+                "input_dataset": "policy",
                 "output_dataset": "prepared_policy",
                 "actions": [
                     {
@@ -91,7 +91,7 @@
             "parameters": {
                 "project_key": "CUSTOMER360_PROJECT",
                 "recipe_name": "prepare_claims",
-                "input_dataset": "claims.csv",
+                "input_dataset": "claims",
                 "output_dataset": "prepared_claims",
                 "actions": [
                     {
@@ -116,7 +116,7 @@
             "parameters": {
                 "project_key": "CUSTOMER360_PROJECT",
                 "recipe_name": "prepare_aiml_insights",
-                "input_dataset": "aiml_insights.xlsx",
+                "input_dataset": "aiml_insights",
                 "output_dataset": "prepared_aiml_insights",
                 "actions": [
                     {
@@ -139,7 +139,7 @@
             "parameters": {
                 "project_key": "CUSTOMER360_PROJECT",
                 "recipe_name": "prepare_scores",
-                "input_dataset": "scores.xlsx",
+                "input_dataset": "scores",
                 "output_dataset": "prepared_scores",
                 "actions": [
                     {
