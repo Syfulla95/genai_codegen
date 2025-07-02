@@ -1,0 +1,64 @@
+version: 2
+
+models:
+  - name: fct_customer_analytics
+    description: "This model provides customer analytics by calculating customer lifetime value and aggregating order metrics."
+    meta:
+      owner: "analytics_team"
+      domain: "customer_analytics"
+    config:
+      materialized: table
+    tags: ["mart", "customer_analytics"]
+    columns:
+      - name: customer_id
+        description: "Unique identifier for each customer."
+        tests:
+          - not_null
+          - unique
+      - name: first_name
+        description: "First name of the customer."
+      - name: last_name
+        description: "Last name of the customer."
+      - name: first_order
+        description: "Date of the customer's first order."
+      - name: most_recent_order
+        description: "Date of the customer's most recent order."
+      - name: number_of_orders
+        description: "Total number of orders placed by the customer."
+      - name: customer_lifetime_value
+        description: "Total value of payments made by the customer over their lifetime."
+
+  - name: fct_order_analytics
+    description: "This model provides detailed order analytics including payment breakdown and total revenue."
+    meta:
+      owner: "analytics_team"
+      domain: "order_analytics"
+    config:
+      materialized: table
+    tags: ["mart", "order_analytics"]
+    columns:
+      - name: order_id
+        description: "Unique identifier for each order."
+        tests:
+          - not_null
+          - unique
+      - name: customer_id
+        description: "Unique identifier for the customer who placed the order."
+        tests:
+          - relationships:
+              to: ref('fct_customer_analytics')
+              field: customer_id
+      - name: order_date
+        description: "Date when the order was placed."
+      - name: status
+        description: "Current status of the order."
+      - name: total_amount
+        description: "Total amount paid for the order."
+      - name: credit_card_amount
+        description: "Amount paid using credit card."
+      - name: coupon_amount
+        description: "Amount discounted using coupons."
+      - name: bank_transfer_amount
+        description: "Amount paid using bank transfer."
+      - name: gift_card_amount
+        description: "Amount paid using gift cards."
