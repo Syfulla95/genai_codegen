@@ -1,0 +1,56 @@
+version: 2
+
+models:
+  - name: fct_audit_item_summary
+    description: This fact model aggregates audit item data for business reporting purposes. It provides metrics such as total operations, unique records, and the first and last operation dates grouped by business component name, field name, and operation code.
+    meta:
+      owner: data_team
+      domain: audit_reporting
+    config:
+      materialized: table
+    tags: ['audit', 'reporting', 'business']
+    columns:
+      - name: buscomp_name
+        description: The name of the business component associated with the audit item.
+        tests:
+          - not_null
+          - dbt_expectations.expect_column_value_lengths_to_be_between:
+              min_value: 1
+              max_value: 255
+      - name: field_name
+        description: The name of the field associated with the audit item.
+        tests:
+          - not_null
+          - dbt_expectations.expect_column_value_lengths_to_be_between:
+              min_value: 1
+              max_value: 255
+      - name: operation_cd
+        description: The operation code indicating the type of operation performed (e.g., insert, update, delete).
+        tests:
+          - not_null
+          - dbt_expectations.expect_column_values_to_be_in_set:
+              value_set: ['insert', 'update', 'delete']
+      - name: total_operations
+        description: The total number of operations performed for the given business component, field, and operation code.
+        tests:
+          - not_null
+          - dbt_expectations.expect_column_values_to_be_between:
+              min_value: 0
+              max_value: 1000000
+      - name: unique_records
+        description: The count of unique records affected by the operations.
+        tests:
+          - not_null
+          - dbt_expectations.expect_column_values_to_be_between:
+              min_value: 0
+              max_value: 1000000
+      - name: first_operation_dt
+        description: The timestamp of the first operation performed for the given business component, field, and operation code.
+        tests:
+          - not_null
+          - dbt_expectations.expect_column_values_to_be_dateutil_parseable
+      - name: last_operation_dt
+        description: The timestamp of the last operation performed for the given business component, field, and operation code.
+        tests:
+          - not_null
+          - dbt_expectations.expect_column_values_to_be_dateutil_parseable
