@@ -1,0 +1,148 @@
+version: 2
+
+models:
+  - name: fct_audit_item_final  # Required
+    description: Final fact table for audit item data, optimized for reporting. This model aggregates and transforms audit item data for efficient querying and reporting purposes.
+    meta:
+      owner: data_engineering_team
+      domain: audit_reporting
+    config:
+      materialized: table
+    tags: [audit, reporting, fact_table]
+    columns:
+      - name: row_id
+        description: Unique identifier for each audit item record.
+        tests:
+          - unique
+          - not_null
+          - dbt_expectations.expect_column_values_to_be_unique
+      - name: created
+        description: Timestamp when the audit item was created.
+        tests:
+          - not_null
+          - dbt_expectations.expect_column_values_to_be_dateutil_parseable
+      - name: created_by
+        description: Identifier of the user who created the audit item.
+        tests:
+          - not_null
+      - name: last_upd
+        description: Timestamp of the last update to the audit item.
+        tests:
+          - not_null
+          - dbt_expectations.expect_column_values_to_be_dateutil_parseable
+      - name: last_upd_by
+        description: Identifier of the user who last updated the audit item.
+        tests:
+          - not_null
+      - name: modification_num
+        description: Number of modifications made to the audit item.
+        tests:
+          - not_null
+          - dbt_expectations.expect_column_values_to_be_between:
+              min_value: 0
+              max_value: 1000
+      - name: conflict_id
+        description: Identifier for conflicts related to the audit item.
+        tests:
+          - not_null
+      - name: buscomp_name
+        description: Name of the business component associated with the audit item.
+        tests:
+          - not_null
+      - name: field_name
+        description: Name of the field being audited.
+        tests:
+          - not_null
+      - name: operation_cd
+        description: Code representing the operation performed on the audit item.
+        tests:
+          - not_null
+          - dbt_expectations.expect_column_values_to_be_in_set:
+              value_set: ['INSERT', 'UPDATE', 'DELETE']
+      - name: record_id
+        description: Identifier for the record associated with the audit item.
+        tests:
+          - not_null
+      - name: user_id
+        description: Identifier for the user associated with the audit item.
+        tests:
+          - not_null
+          - relationships:
+              to: ref('stg_sf_ods_srm_usr')
+              field: src_usr_id
+      - name: operation_dt
+        description: Date and time when the operation was performed on the audit item.
+        tests:
+          - not_null
+          - dbt_expectations.expect_column_values_to_be_dateutil_parseable
+      - name: child_bc_name
+        description: Name of the child business component associated with the audit item.
+        tests:
+          - not_null
+      - name: new_val
+        description: New value of the field after the operation.
+        tests:
+          - not_null
+      - name: old_val
+        description: Old value of the field before the operation.
+        tests:
+          - not_null
+      - name: item_iden_num
+        description: Identifier number for the audit item.
+        tests:
+          - not_null
+          - unique
+      - name: audit_log
+        description: Log details for the audit item.
+        tests:
+          - not_null
+      - name: db_last_upd
+        description: Timestamp of the last database update for the audit item.
+        tests:
+          - not_null
+          - dbt_expectations.expect_column_values_to_be_dateutil_parseable
+      - name: sync_dt
+        description: Timestamp when the audit item was synchronized.
+        tests:
+          - not_null
+          - dbt_expectations.expect_column_values_to_be_dateutil_parseable
+      - name: old_owner_ldap
+        description: LDAP identifier for the previous owner of the audit item.
+        tests:
+          - not_null
+          - relationships:
+              to: ref('stg_sf_ods_srm_usr')
+              field: ldap_id
+      - name: new_owner_ldap
+        description: LDAP identifier for the new owner of the audit item.
+        tests:
+          - not_null
+          - relationships:
+              to: ref('stg_sf_ods_srm_usr')
+              field: ldap_id
+      - name: old_source_group
+        description: Group name for the previous source of the audit item.
+        tests:
+          - not_null
+          - relationships:
+              to: ref('stg_sf_ods_srm_grp')
+              field: devlpr_nm
+      - name: new_source_group
+        description: Group name for the new source of the audit item.
+        tests:
+          - not_null
+          - relationships:
+              to: ref('stg_sf_ods_srm_grp')
+              field: devlpr_nm
+      - name: old_status_transformed
+        description: Transformed status of the audit item before the operation.
+        tests:
+          - not_null
+          - dbt_expectations.expect_column_values_to_be_in_set:
+              value_set: ['Reopen_SF', 'Closed', 'Open', 'Pending']
+      - name: new_status_transformed
+        description: Transformed status of the audit item after the operation.
+        tests:
+          - not_null
+          - dbt_expectations.expect_column_values_to_be_in_set:
+              value_set: ['Reopen_SF', 'Closed', 'Open', 'Pending']
