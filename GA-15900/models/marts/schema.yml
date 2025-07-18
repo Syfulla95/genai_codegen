@@ -1,0 +1,57 @@
+version: 2
+
+models:
+  - name: fct_audit_item  # Required
+    description: "Final model consolidating all audit item transformations, including owner, status, and source data."
+    meta:
+      owner: "data_engineering_team"
+      domain: "audit"
+    config:
+      materialized: incremental
+    tags: ["audit", "consolidation"]
+    columns:
+      - name: row_id
+        description: "Unique identifier for each audit item."
+        tests:
+          - unique
+          - not_null
+          - dbt_expectations.expect_column_values_to_be_unique
+      - name: operation_dt
+        description: "Timestamp of the operation associated with the audit item."
+        tests:
+          - not_null
+          - dbt_expectations.expect_column_values_to_be_dateutil_parseable
+      - name: old_owner_ldap
+        description: "LDAP identifier of the previous owner of the audit item."
+        tests:
+          - not_null
+          - dbt_expectations.expect_column_value_lengths_to_be_between:
+              min_value: 5
+              max_value: 50
+      - name: new_owner_ldap
+        description: "LDAP identifier of the new owner of the audit item."
+        tests:
+          - not_null
+          - dbt_expectations.expect_column_value_lengths_to_be_between:
+              min_value: 5
+              max_value: 50
+      - name: updated_status
+        description: "Updated status of the audit item based on business rules."
+        tests:
+          - not_null
+          - dbt_expectations.expect_column_values_to_be_in_set:
+              value_set: ["Referred", "Button", "Other"]
+      - name: old_source_group
+        description: "Group name associated with the previous source of the audit item."
+        tests:
+          - not_null
+          - dbt_expectations.expect_column_value_lengths_to_be_between:
+              min_value: 3
+              max_value: 100
+      - name: new_source_group
+        description: "Group name associated with the new source of the audit item."
+        tests:
+          - not_null
+          - dbt_expectations.expect_column_value_lengths_to_be_between:
+              min_value: 3
+              max_value: 100
