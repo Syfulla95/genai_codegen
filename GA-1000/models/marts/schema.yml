@@ -1,0 +1,118 @@
+version: 2
+
+models:
+  - name: fct_audit_item  # Required
+    description: Fact table for audit items with incremental updates. This model consolidates audit data with user information and applies business logic transformations.
+    meta:
+      owner: data_team
+      domain: audit
+    config:
+      materialized: incremental
+      unique_key: row_id
+    tags: [audit, fact_table]
+    columns:
+      - name: row_id
+        description: Unique identifier for each audit record.
+        tests:
+          - unique
+          - not_null
+          - dbt_expectations.expect_column_values_to_be_unique
+      - name: record_id
+        description: Identifier for the record associated with the audit item.
+        tests:
+          - not_null
+      - name: created_by
+        description: User who created the audit record.
+        tests:
+          - not_null
+          - relationships:
+              to: ref('stg_tblsf_user')
+              field: id
+      - name: last_upd_by
+        description: User who last updated the audit record.
+        tests:
+          - not_null
+          - relationships:
+              to: ref('stg_tblsf_user')
+              field: id
+      - name: created
+        description: Timestamp when the audit record was created.
+        tests:
+          - not_null
+          - dbt_expectations.expect_column_values_to_be_dateutil_parseable
+      - name: last_upd
+        description: Timestamp when the audit record was last updated.
+        tests:
+          - not_null
+          - dbt_expectations.expect_column_values_to_be_dateutil_parseable
+      - name: operation_dt
+        description: Date and time of the operation associated with the audit record.
+        tests:
+          - not_null
+          - dbt_expectations.expect_column_values_to_be_dateutil_parseable
+      - name: modification_num
+        description: Number indicating the modification sequence for the audit record.
+        tests:
+          - not_null
+          - dbt_expectations.expect_column_values_to_be_between:
+              min_value: 0
+              max_value: 1000
+      - name: conflict_id
+        description: Identifier for conflicts associated with the audit record.
+        tests:
+          - not_null
+      - name: buscomp_name
+        description: Name of the business component associated with the audit record.
+        tests:
+          - not_null
+      - name: user_id
+        description: Identifier for the user associated with the audit record.
+        tests:
+          - not_null
+          - relationships:
+              to: ref('stg_tblsf_user')
+              field: id
+      - name: old_owner
+        description: Identifier for the previous owner of the record.
+        tests:
+          - not_null
+          - relationships:
+              to: ref('stg_tblsf_user')
+              field: id
+      - name: new_owner
+        description: Identifier for the new owner of the record.
+        tests:
+          - not_null
+          - relationships:
+              to: ref('stg_tblsf_user')
+              field: id
+      - name: operation_cd
+        description: Code representing the operation performed on the record.
+        tests:
+          - not_null
+          - dbt_expectations.expect_column_values_to_be_in_set:
+              value_set: ['Create', 'Update', 'Delete', 'Re-Open', 'Closed']
+      - name: field_name
+        description: Name of the field that was modified in the audit record.
+        tests:
+          - not_null
+      - name: old_user_name
+        description: Name of the previous user associated with the record.
+        tests:
+          - not_null
+      - name: new_user_name
+        description: Name of the new user associated with the record.
+        tests:
+          - not_null
+      - name: updated_old_status
+        description: Transformed status of the record before the operation.
+        tests:
+          - not_null
+          - dbt_expectations.expect_column_values_to_be_in_set:
+              value_set: ['Reopen_SF', 'Open', 'Pending', 'Closed']
+      - name: updated_new_status
+        description: Transformed status of the record after the operation.
+        tests:
+          - not_null
+          - dbt_expectations.expect_column_values_to_be_in_set:
+              value_set: ['Closed_SF', 'Open', 'Pending', 'Reopen']
