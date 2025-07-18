@@ -1,0 +1,26 @@
+version: 2
+
+models:
+  - name: fct_sales_summary
+    description: "Fact model summarizing sales data by region, aggregating total sales amounts."
+    meta:
+      owner: sales_team
+      domain: sales_analysis
+    config:
+      materialized: incremental
+    tags: ['sales', 'summary']
+    columns:
+      - name: region_name
+        description: "Name of the region where sales occurred."
+        tests:
+          - not_null
+          - dbt_expectations.expect_column_value_lengths_to_be_between:
+              min_value: 5
+              max_value: 50
+      - name: total_sales
+        description: "Total sales amount aggregated by region."
+        tests:
+          - not_null
+          - dbt_expectations.expect_column_values_to_be_between:
+              min_value: 0
+              max_value: 10000000
