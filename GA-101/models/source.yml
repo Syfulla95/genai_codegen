@@ -1,0 +1,387 @@
+version: 2
+
+sources:
+  - name: genai_power_bi
+    description: Source tables for GENAI Power BI
+    database: GENAI_POWER_BI
+    schema: PUBLIC
+
+    tables:
+      - name: BADDATA
+        description: Table containing bad data records
+        identifier: BADDATA
+
+        columns:
+          - name: ROW_ID
+            description: Unique identifier for the row
+            tests:
+              - not_null
+              - unique
+          - name: OPERATION_DT
+            description: Date and time of the operation
+          - name: FIELDNAME
+            description: Name of the field
+          - name: NEWVALUE
+            description: New value of the field
+          - name: OLDVALUE
+            description: Old value of the field
+          - name: COLCODE
+            description: Code of the column
+          - name: ERRORCODE
+            description: Error code associated with the record
+          - name: ERRORCOLUMN
+            description: Column where the error occurred
+
+      - name: TBL_S_AUDIT_ITEM_NEWPROCESS
+        description: Audit item table for new processes
+        identifier: TBL_S_AUDIT_ITEM_NEWPROCESS
+
+        columns:
+          - name: ROW_ID
+            description: Unique identifier for the row
+            tests:
+              - not_null
+              - unique
+          - name: CREATED
+            description: Timestamp when the record was created
+          - name: CREATED_BY
+            description: Identifier of the creator
+          - name: LAST_UPD
+            description: Timestamp of the last update
+          - name: LAST_UPD_BY
+            description: Identifier of the last updater
+          - name: MODIFICATION_NUM
+            description: Number of modifications
+          - name: CONFLICT_ID
+            description: Conflict identifier
+          - name: BUSCOMP_NAME
+            description: Business component name
+          - name: FIELD_NAME
+            description: Name of the field
+          - name: OPERATION_CD
+            description: Operation code
+          - name: RECORD_ID
+            description: Record identifier
+          - name: USER_ID
+            description: User identifier
+          - name: OPERATION_DT
+            description: Date and time of the operation
+          - name: CHILD_BC_NAME
+            description: Child business component name
+          - name: NEW_VAL
+            description: New value
+          - name: OLD_VAL
+            description: Old value
+          - name: ITEM_IDEN_NUM
+            description: Item identification number
+          - name: AUDIT_LOG
+            description: Audit log details
+          - name: DB_LAST_UPD
+            description: Database last update timestamp
+          - name: SYNC_DT
+            description: Synchronization date
+          - name: OLD_OWNER
+            description: Previous owner
+          - name: NEW_OWNER
+            description: New owner
+          - name: OLD_SOURCE
+            description: Previous source
+          - name: NEW_SOURCE
+            description: New source
+          - name: OLD_STATUS
+            description: Previous status
+          - name: NEW_STATUS
+            description: New status
+
+      - name: TBL_S_AUDIT_ITEM_PARSED_LOG_NEWPROCESS
+        description: Parsed log for audit items in new processes
+        identifier: TBL_S_AUDIT_ITEM_PARSED_LOG_NEWPROCESS
+
+        columns:
+          - name: ROW_ID
+            description: Unique identifier for the row
+            tests:
+              - not_null
+              - unique
+          - name: OPERATION_DT
+            description: Date and time of the operation
+          - name: FIELDNAME
+            description: Name of the field
+          - name: NEWVALUE
+            description: New value of the field
+          - name: OLDVALUE
+            description: Old value of the field
+          - name: COLCODE
+            description: Code of the column
+
+      - name: TBL_S_AUDIT_ITEM_PARSED_LOG_SF_NEWPROCESS
+        description: Parsed log for audit items in SF new processes
+        identifier: TBL_S_AUDIT_ITEM_PARSED_LOG_SF_NEWPROCESS
+
+        columns:
+          - name: ROW_ID
+            description: Unique identifier for the row
+            tests:
+              - not_null
+              - unique
+          - name: OPERATION_DT
+            description: Date and time of the operation
+          - name: FIELDNAME
+            description: Name of the field
+          - name: NEWVALUE
+            description: New value of the field
+          - name: OLDVALUE
+            description: Old value of the field
+          - name: COLCODE
+            description: Code of the column
+
+      - name: TBL_S_AUDIT_ITEM_SF_NEWPROCESS
+        description: Audit item table for SF new processes
+        identifier: TBL_S_AUDIT_ITEM_SF_NEWPROCESS
+
+        columns:
+          - name: ROW_ID
+            description: Unique identifier for the row
+            tests:
+              - not_null
+              - unique
+          - name: CREATED
+            description: Timestamp when the record was created
+          - name: CREATED_BY
+            description: Identifier of the creator
+          - name: LAST_UPD
+            description: Timestamp of the last update
+          - name: LAST_UPD_BY
+            description: Identifier of the last updater
+          - name: MODIFICATION_NUM
+            description: Number of modifications
+          - name: CONFLICT_ID
+            description: Conflict identifier
+          - name: BUSCOMP_NAME
+            description: Business component name
+          - name: FIELD_NAME
+            description: Name of the field
+          - name: OPERATION_CD
+            description: Operation code
+          - name: RECORD_ID
+            description: Record identifier
+          - name: USER_ID
+            description: User identifier
+          - name: OPERATION_DT
+            description: Date and time of the operation
+          - name: CHILD_BC_NAME
+            description: Child business component name
+          - name: NEW_VAL
+            description: New value
+          - name: OLD_VAL
+            description: Old value
+          - name: ITEM_IDEN_NUM
+            description: Item identification number
+          - name: AUDIT_LOG
+            description: Audit log details
+          - name: DB_LAST_UPD
+            description: Database last update timestamp
+          - name: SYNC_DT
+            description: Synchronization date
+          - name: OLD_OWNER
+            description: Previous owner
+          - name: NEW_OWNER
+            description: New owner
+          - name: OLD_SOURCE
+            description: Previous source
+          - name: NEW_SOURCE
+            description: New source
+          - name: OLD_STATUS
+            description: New status
+          - name: NEW_STATUS
+            description: Previous status
+
+      - name: TBL_S_AUDIT_ITEM_TEMP_NEWPROCESS
+        description: Temporary audit item table for new processes
+        identifier: TBL_S_AUDIT_ITEM_TEMP_NEWPROCESS
+
+        columns:
+          - name: ROW_ID
+            description: Unique identifier for the row
+            tests:
+              - not_null
+              - unique
+          - name: CREATED
+            description: Timestamp when the record was created
+          - name: CREATED_BY
+            description: Identifier of the creator
+          - name: LAST_UPD
+            description: Timestamp of the last update
+          - name: LAST_UPD_BY
+            description: Identifier of the last updater
+          - name: MODIFICATION_NUM
+            description: Number of modifications
+          - name: CONFLICT_ID
+            description: Conflict identifier
+          - name: BUSCOMP_NAME
+            description: Business component name
+          - name: FIELD_NAME
+            description: Name of the field
+          - name: OPERATION_CD
+            description: Operation code
+          - name: RECORD_ID
+            description: Record identifier
+          - name: USER_ID
+            description: User identifier
+          - name: OPERATION_DT
+            description: Date and time of the operation
+          - name: CHILD_BC_NAME
+            description: Child business component name
+          - name: NEW_VAL
+            description: New value
+          - name: OLD_VAL
+            description: Old value
+          - name: ITEM_IDEN_NUM
+            description: Item identification number
+          - name: AUDIT_LOG
+            description: Audit log details
+          - name: DB_LAST_UPD
+            description: Database last update timestamp
+          - name: SYNC_DT
+            description: Synchronization date
+          - name: OLD_OWNER
+            description: Previous owner
+          - name: NEW_OWNER
+            description: New owner
+          - name: OLD_SOURCE
+            description: Previous source
+          - name: NEW_SOURCE
+            description: New source
+          - name: OLD_STATUS
+            description: New status
+          - name: NEW_STATUS
+            description: Previous status
+          - name: AUDIT_SOURCE_CD
+            description: Audit source code
+          - name: BC_BASE_TBL
+            description: Base table for business component
+          - name: CHILD_BC_BASE_TBL
+            description: Base table for child business component
+          - name: CHILD_RECORD_ID
+            description: Child record identifier
+          - name: DB_LAST_UPD_SRC
+            description: Source of the last database update
+          - name: GROUP_NUM
+            description: Group number
+          - name: LINK_NAME
+            description: Name of the link
+          - name: NODE_NAME
+            description: Name of the node
+          - name: SRC_DEST_ID
+            description: Source destination identifier
+          - name: TBL_NAME
+            description: Name of the table
+          - name: TBL_RECORD_ID
+            description: Table record identifier
+          - name: OLD_MODE
+            description: New mode
+          - name: NEW_MODE
+            description: Previous mode
+          - name: TRANS_LDAP
+            description: LDAP transformation
+
+      - name: TBLSF_CASEHISTORY_IMPORT
+        description: Import table for case history
+        identifier: TBLSF_CASEHISTORY_IMPORT
+
+        columns:
+          - name: ROW_ID
+            description: Unique identifier for the row
+            tests:
+              - not_null
+              - unique
+          - name: RECORD_ID
+            description: Record identifier
+          - name: CREATED_BY
+            description: Identifier of the creator
+          - name: LAST_UPD_BY
+            description: Identifier of the last updater
+          - name: CREATED
+            description: Timestamp when the record was created
+          - name: LAST_UPD
+            description: Timestamp of the last update
+          - name: OPERATION_DT
+            description: Date and time of the operation
+          - name: MODIFICATION_NUM
+            description: Number of modifications
+          - name: CONFLICT_ID
+            description: Conflict identifier
+          - name: BUSCOMP_NAME
+            description: Business component name
+          - name: USER_ID
+            description: User identifier
+          - name: OLD_OWNER
+            description: Previous owner
+          - name: NEW_OWNER
+            description: New owner
+          - name: OPERATION_CD
+            description: Operation code
+          - name: FIELD_NAME
+            description: Name of the field
+
+      - name: TBLSF_USER
+        description: User table
+        identifier: TBLSF_USER
+
+        columns:
+          - name: ID
+            description: User identifier
+            tests:
+              - not_null
+              - unique
+          - name: NAME
+            description: Name of the user
+
+      - name: SF_ODS_SRM_GRP
+        description: SRM group table in ODS
+        identifier: SF_ODS_SRM_GRP
+
+        columns:
+          - name: SRC_GRP_ID
+            description: Source group identifier
+            tests:
+              - not_null
+              - unique
+          - name: DEVLPR_NM
+            description: Developer name
+          - name: TRANS_EFF_TMSP
+            description: Effective timestamp of the transaction
+          - name: TRANS_EXP_TMSP
+            description: Expiry timestamp of the transaction
+
+      - name: SF_ODS_SRM_USR
+        description: SRM user table in ODS
+        identifier: SF_ODS_SRM_USR
+
+        columns:
+          - name: SRC_USR_ID
+            description: Source user identifier
+            tests:
+              - not_null
+              - unique
+          - name: LDAP_ID
+            description: LDAP identifier
+          - name: TRANS_EFF_TMSP
+            description: Effective timestamp of the transaction
+          - name: TRANS_EXP_TMSP
+            description: Expiry timestamp of the transaction
+
+      - name: TBLSF_GROUP
+        description: Group table
+        identifier: TBLSF_GROUP
+
+        columns:
+          - name: ID
+            description: Group identifier
+            tests:
+              - not_null
+              - unique
+          - name: DEVELOPERNAME
+            description: Developer name
+          - name: GROUP_NAME
+            description: Name of the group
